@@ -34,7 +34,7 @@ def get_activations(layer_num, base_model, mode='summation', folder='ILSVRC2012_
     timesteps = [time.time()]
     save_interval = 10000
     time_interval = 1000
-    for img_id in range(1, AlexNet.val_set_size + 1):
+    for img_id in range(1, 3):
 
         # Convert image_id to file location
         id_str = str(img_id)
@@ -48,7 +48,7 @@ def get_activations(layer_num, base_model, mode='summation', folder='ILSVRC2012_
         # Make sure that dimensions 2 and 3 are spacial (Image is square)
         assert activation_img.shape[2] == activation_img.shape[3], "Index ordering incorrect"
 
-        if mode == 'summing':
+        if mode == 'summation':
             # Sum over spacial dimension to get activation for given filter and given image
             assert activation_img.shape[2] == activation_img.shape[3], "Index ordering incorrect"
             activation_img = activation_img.sum(3)
@@ -99,7 +99,7 @@ def get_activations(layer_num, base_model, mode='summation', folder='ILSVRC2012_
     np.savetxt(activation_matrix_filename, activations, delimiter=',')
 
 
-def find_strongest_image(layer_num, top=9, folder='ILSVRC2012_img_val'):
+def find_strongest_image(layer_num, top=1, folder='ILSVRC2012_img_val'):
     """
     Reads the data from .csv file returned by 'get_activations' and copies strongest activating images in folders
     :param layer_num: 
@@ -111,10 +111,11 @@ def find_strongest_image(layer_num, top=9, folder='ILSVRC2012_img_val'):
 
     activation_matrix_filename = 'Data/Strongest_Activation_Layer{}.csv'.format(layer_num)
     read_from_folder = folder
+    print('Layer{}_Strongest_IMG'.format(layer_num))
     save_to_folder = 'Layer{}_Strongest_IMG'.format(layer_num)
 
     with open(activation_matrix_filename, mode='r'):
-        activations = pandas.read_csv(activation_matrix_filename, dtype=np.float32, header=None).as_matrix()
+        activations = pandas.read_csv(activation_matrix_filename, dtype=np.float32, header=None).to_numpy()
 
     argsorted_activations = activations.argsort(axis=0)
     top_indices = [indices[-top:][::-1] for indices in argsorted_activations.T]
@@ -126,17 +127,17 @@ def find_strongest_image(layer_num, top=9, folder='ILSVRC2012_img_val'):
         pass
     os.makedirs(save_to_folder)
 
-    for f in range(1, filters + 1):
-        t = 1
-        for img_id in top_indices[f]:
-            img_name = str(img_id)
-            while len(img_name) < 5:
-                img_name = '0' + img_name
-            copy_from = read_from_folder + '/ILSVRC2012_val_000' + img_name + '.JPEG'
+    # for f in range(1, filters + 1):
+    #     t = 1
+    #     for img_id in top_indices[f]:
+    #         img_name = str(img_id)
+    #         while len(img_name) < 5:
+    #             img_name = '0' + img_name
+    #         copy_from = read_from_folder + '/ILSVRC2012_val_000' + img_name + '.JPEG'
 
-            copy_to = save_to_folder + '\Layer' + str(layer_num) + '_Filter' + str(f) + '_Top' + str(t) + '.JPEG'
-            t += 1
-            copyfile(copy_from, copy_to)
+    #         copy_to = save_to_folder + '/Layer' + str(layer_num) + '_Filter' + str(f) + '_Top' + str(t) + '.JPEG'
+    #         t += 1
+    #         copyfile(copy_from, copy_to)
 
 
 def get_strongest_filter(img_id, layer):

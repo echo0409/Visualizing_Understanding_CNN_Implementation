@@ -8,6 +8,9 @@ import numpy as np
 import os
 from random import randint
 from shutil import copyfile, rmtree
+import os
+
+os.environ['KMP_DUPLICATE_LIB_OK']='True'
 
 
 class Deconvolution:
@@ -248,7 +251,7 @@ def visualize_top_images(layer, f, constrast):
     if not os.path.exists(save_to_folder):
         os.makedirs(save_to_folder)
 
-    for t in range(1, 10):
+    for t in range(1, 2):
         file_name = '/Layer{}_Filter{}_Top{}.JPEG'.format(layer, f, t)
 
         projection = Deconvolution(conv_base_model).project_down(get_from_folder + file_name, layer, f)
@@ -398,10 +401,10 @@ if __name__ == '__main__':
     #     #project_top_layer_filters(deconv_base_model=deconv_base_model)
     #     #project_multiple_layer_filters(deconv_base_model=deconv_base_model)
     # project_multiple_layer_filters(deconv_base_model=deconv_base_model)
-    for img_id in (14913, 31634, 48518, 37498, 2254):
+    for img_id in ('6'):
         project_multiple_layer_filters(img_id=img_id, deconv_base_model=deconv_base_model)
-    for img_id in (31977,):
-        project_top_layer_filters(img_id=img_id, deconv_base_model=deconv_base_model)
+    # for img_id in (5,):
+    #     project_top_layer_filters(img_id=img_id, deconv_base_model=deconv_base_model)
 
-    pass
-    # visualize_top_images(layer=5, f=4, constrast=13)
+    #pass
+    #visualize_top_images(layer=5, f=4, constrast=13)
